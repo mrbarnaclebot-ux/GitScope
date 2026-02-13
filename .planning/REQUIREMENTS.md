@@ -26,14 +26,14 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Infrastructure
 
-- [ ] **INFR-01**: State persisted as JSON file with atomic writes (write to temp file, rename) — crash-safe
-- [ ] **INFR-02**: State file stores repo snapshots with star counts, notification history with timestamps, and schema version
-- [ ] **INFR-03**: Environment variables validated at startup with zod — fails fast with clear error messages for missing GITHUB_TOKEN, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
-- [ ] **INFR-04**: Structured JSON logging via pino with module-scoped loggers, timestamps, and contextual IDs
-- [ ] **INFR-05**: Bot recovers gracefully from corrupt/missing state file (falls back to empty state, logs warning)
-- [ ] **INFR-06**: Project uses TypeScript with strict mode, Node.js 22.x, grammY, @octokit/rest, node-cron
+- [x] **INFR-01**: State persisted as JSON file with atomic writes (write to temp file, rename) — crash-safe
+- [x] **INFR-02**: State file stores repo snapshots with star counts, notification history with timestamps, and schema version
+- [x] **INFR-03**: Environment variables validated at startup with zod — fails fast with clear error messages for missing GITHUB_TOKEN, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+- [x] **INFR-04**: Structured JSON logging via pino with module-scoped loggers, timestamps, and contextual IDs
+- [x] **INFR-05**: Bot recovers gracefully from corrupt/missing state file (falls back to empty state, logs warning)
+- [x] **INFR-06**: Project uses TypeScript with strict mode, Node.js 22.x, grammY, @octokit/rest, node-cron
 - [ ] **INFR-07**: Deploys as Render Background Worker with environment variables for secrets
-- [ ] **INFR-08**: .gitignore includes .env and state.json before first commit; GitHub PAT uses fine-grained read-only public scope
+- [x] **INFR-08**: .gitignore includes .env and state.json before first commit; GitHub PAT uses fine-grained read-only public scope
 
 ## v2 Requirements
 
@@ -84,14 +84,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NOTF-03 | Phase 3 | Pending |
 | NOTF-04 | Phase 3 | Pending |
 | NOTF-05 | Phase 3 | Pending |
-| INFR-01 | Phase 1 | Pending |
-| INFR-02 | Phase 1 | Pending |
-| INFR-03 | Phase 1 | Pending |
-| INFR-04 | Phase 1 | Pending |
-| INFR-05 | Phase 1 | Pending |
-| INFR-06 | Phase 1 | Pending |
+| INFR-01 | Phase 1 | ✓ Done |
+| INFR-02 | Phase 1 | ✓ Done |
+| INFR-03 | Phase 1 | ✓ Done |
+| INFR-04 | Phase 1 | ✓ Done |
+| INFR-05 | Phase 1 | ✓ Done |
+| INFR-06 | Phase 1 | ✓ Done |
 | INFR-07 | Phase 3 | Pending |
-| INFR-08 | Phase 1 | Pending |
+| INFR-08 | Phase 1 | ✓ Done |
 
 **Coverage:**
 - v1 requirements: 19 total
@@ -100,4 +100,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-13*
-*Last updated: 2026-02-13 after roadmap creation*
+*Last updated: 2026-02-13 after Phase 1 completion*
