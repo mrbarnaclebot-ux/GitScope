@@ -44,11 +44,12 @@ Plans:
   3. Alerts arrive in the Telegram group as HTML-formatted messages containing the repo name (linked), star count, velocity delta, description, language, and age
   4. Each alert is tagged with a severity tier (notable / hot / viral) based on velocity magnitude
   5. The bot tracks GitHub Search API and REST API rate limits as separate counters, respects Retry-After headers, and never exceeds rate limits during normal operation
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md -- GitHub integration layer (throttling plugin, config extension, state schema, client, search)
+- [ ] 02-02-PLAN.md -- Business logic and Telegram layer (velocity, classifier, formatter, sender)
+- [ ] 02-03-PLAN.md -- Cycle orchestration, scheduler, and entry point wiring
 
 ### Phase 3: Notification Reliability & Deployment
 **Goal**: Alerts are deduplicated, batched when busy, retried on failure, and the bot runs reliably on Render as an always-on background worker
@@ -73,5 +74,5 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Infrastructure Foundation | 2/2 | ✓ Complete | 2026-02-13 |
-| 2. Monitoring & Alerting | 0/TBD | Not started | - |
+| 2. Monitoring & Alerting | 0/3 | Planned | - |
 | 3. Notification Reliability & Deployment | 0/TBD | Not started | - |
