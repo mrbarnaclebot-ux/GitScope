@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/mrbarnaclebot-ux/GitScope#readme",
   "dependencies": {
+    "@octokit/plugin-throttling": "^11.0.3",
     "@octokit/rest": "^22.0.1",
     "grammy": "^1.40.0",
     "node-cron": "^4.2.1",

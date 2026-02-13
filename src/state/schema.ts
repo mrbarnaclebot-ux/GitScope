@@ -4,6 +4,7 @@ const repoSnapshotSchema = z.object({
   owner: z.string(),
   name: z.string(),
   description: z.string().nullable(),
+  language: z.string().nullable(),
   topics: z.array(z.string()),
   addedAt: z.string(),
   snapshots: z.array(

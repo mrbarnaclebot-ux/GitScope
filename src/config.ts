@@ -14,6 +14,11 @@ const envSchema = z.object({
   LOG_LEVEL: z
     .enum(["trace", "debug", "info", "warn", "error", "fatal"])
     .default("info"),
+  MONITOR_KEYWORDS: z
+    .string()
+    .default("openclaw,claude-code,clawdbot,moltbot,clawhub,openclaw skills")
+    .transform((s) => s.split(",").map((k) => k.trim())),
+  MONITOR_CRON: z.string().default("*/30 * * * *"),
 });
 
 export type Config = z.infer<typeof envSchema>;
