@@ -28,11 +28,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. State file persists a JSON object with repo snapshots and notification history, survives process restarts, and writes are atomic (no corruption on crash)
   4. A corrupt or missing state file causes the bot to log a warning and continue with empty state rather than crashing
   5. All log output is structured JSON with timestamps, module names, and contextual IDs -- visible in stdout
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md -- Project scaffolding + config validation + structured logging
+- [ ] 01-02-PLAN.md -- State persistence + entry point wiring
 
 ### Phase 2: Monitoring & Alerting
 **Goal**: The bot discovers trending repos in the OpenClaw/Claude Code ecosystem and delivers formatted alerts to the Telegram group -- the core value proposition working end to end
@@ -72,6 +72,6 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure Foundation | 0/TBD | Not started | - |
+| 1. Infrastructure Foundation | 0/2 | Planned | - |
 | 2. Monitoring & Alerting | 0/TBD | Not started | - |
 | 3. Notification Reliability & Deployment | 0/TBD | Not started | - |
