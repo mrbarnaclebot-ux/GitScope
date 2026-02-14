@@ -8,11 +8,29 @@ import { startScheduler } from "./scheduler.js";
 
 const log = createLogger("main");
 
+function setupGracefulShutdown(store: StateStore): void {
+  const shutdown = async (signal: string) => {
+    log.info({ signal }, "Shutdown signal received, saving state");
+    try {
+      await store.save();
+      log.info("State saved, exiting");
+    } catch (err) {
+      log.error({ err }, "Failed to save state on shutdown");
+    }
+    process.exit(0);
+  };
+
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+  process.on("SIGINT", () => shutdown("SIGINT"));
+}
+
 async function main(): Promise<void> {
   log.info("GitScope starting");
 
   const store = new StateStore(config.STATE_FILE_PATH, createLogger("state"));
   await store.load();
+
+  setupGracefulShutdown(store);
 
   const state = store.getState();
   const repoCount = Object.keys(state.repos).length;
