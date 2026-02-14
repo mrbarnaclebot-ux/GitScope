@@ -60,11 +60,12 @@ Plans:
   2. When more than 5 repos trend simultaneously, the bot sends a single digest message instead of individual alerts
   3. A failed Telegram delivery is retried with exponential backoff, and formatting errors fall back to plain text instead of dropping the notification
   4. The bot runs as a Render Background Worker with environment variables for secrets, starts automatically, and stays online without manual intervention
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
+- [ ] 03-01-PLAN.md -- Sender reliability (auto-retry, plain-text fallback) + config extension
+- [ ] 03-02-PLAN.md -- Digest formatter + graceful shutdown + Render deployment config
+- [ ] 03-03-PLAN.md -- Cycle restructuring (deduplication + batching)
 
 ## Progress
 
@@ -75,4 +76,4 @@ Phases execute in numeric order: 1 -> 2 -> 3
 |-------|----------------|--------|-----------|
 | 1. Infrastructure Foundation | 2/2 | ✓ Complete | 2026-02-13 |
 | 2. Monitoring & Alerting | 3/3 | ✓ Complete | 2026-02-14 |
-| 3. Notification Reliability & Deployment | 0/TBD | Not started | - |
+| 3. Notification Reliability & Deployment | 0/3 | Not started | - |
