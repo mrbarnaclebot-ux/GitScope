@@ -19,6 +19,16 @@ const envSchema = z.object({
     .default("openclaw,claude-code,clawdbot,moltbot,clawhub,openclaw skills")
     .transform((s) => s.split(",").map((k) => k.trim())),
   MONITOR_CRON: z.string().default("*/30 * * * *"),
+  COOLDOWN_DAYS: z
+    .string()
+    .default("7")
+    .transform((s) => parseInt(s, 10))
+    .pipe(z.number().min(1).max(90)),
+  BATCH_THRESHOLD: z
+    .string()
+    .default("5")
+    .transform((s) => parseInt(s, 10))
+    .pipe(z.number().min(1).max(100)),
 });
 
 export type Config = z.infer<typeof envSchema>;
