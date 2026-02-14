@@ -19,10 +19,10 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Notifications
 
 - [x] **NOTF-01**: Bot sends formatted Telegram alerts with HTML parse mode — repo name (linked), star count, velocity delta, description, language, age
-- [ ] **NOTF-02**: Bot deduplicates notifications — same repo not re-alerted within cooldown period (configurable, default 7 days)
-- [ ] **NOTF-03**: Deduplication state persists across restarts (written to disk after successful delivery)
-- [ ] **NOTF-04**: Bot batches alerts when >5 repos trend simultaneously into a single digest message
-- [ ] **NOTF-05**: Bot retries failed Telegram deliveries with exponential backoff, falls back to plain text on formatting errors
+- [x] **NOTF-02**: Bot deduplicates notifications — same repo not re-alerted within cooldown period (configurable, default 7 days)
+- [x] **NOTF-03**: Deduplication state persists across restarts (written to disk after successful delivery)
+- [x] **NOTF-04**: Bot batches alerts when >5 repos trend simultaneously into a single digest message
+- [x] **NOTF-05**: Bot retries failed Telegram deliveries with exponential backoff, falls back to plain text on formatting errors
 
 ### Infrastructure
 
@@ -32,7 +32,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **INFR-04**: Structured JSON logging via pino with module-scoped loggers, timestamps, and contextual IDs
 - [x] **INFR-05**: Bot recovers gracefully from corrupt/missing state file (falls back to empty state, logs warning)
 - [x] **INFR-06**: Project uses TypeScript with strict mode, Node.js 22.x, grammY, @octokit/rest, node-cron
-- [ ] **INFR-07**: Deploys as Render Background Worker with environment variables for secrets
+- [x] **INFR-07**: Deploys as Render Background Worker with environment variables for secrets
 - [x] **INFR-08**: .gitignore includes .env and state.json before first commit; GitHub PAT uses fine-grained read-only public scope
 
 ## v2 Requirements
@@ -80,17 +80,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MON-05 | Phase 2 | ✓ Done |
 | MON-06 | Phase 2 | ✓ Done |
 | NOTF-01 | Phase 2 | ✓ Done |
-| NOTF-02 | Phase 3 | Pending |
-| NOTF-03 | Phase 3 | Pending |
-| NOTF-04 | Phase 3 | Pending |
-| NOTF-05 | Phase 3 | Pending |
+| NOTF-02 | Phase 3 | ✓ Done |
+| NOTF-03 | Phase 3 | ✓ Done |
+| NOTF-04 | Phase 3 | ✓ Done |
+| NOTF-05 | Phase 3 | ✓ Done |
 | INFR-01 | Phase 1 | ✓ Done |
 | INFR-02 | Phase 1 | ✓ Done |
 | INFR-03 | Phase 1 | ✓ Done |
 | INFR-04 | Phase 1 | ✓ Done |
 | INFR-05 | Phase 1 | ✓ Done |
 | INFR-06 | Phase 1 | ✓ Done |
-| INFR-07 | Phase 3 | Pending |
+| INFR-07 | Phase 3 | ✓ Done |
 | INFR-08 | Phase 1 | ✓ Done |
 
 **Coverage:**
@@ -100,4 +100,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-13*
-*Last updated: 2026-02-14 after Phase 2 completion*
+*Last updated: 2026-02-14 after Phase 3 completion*
