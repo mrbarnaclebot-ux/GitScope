@@ -1,6 +1,10 @@
 import { config } from "./config.js";
 import { createLogger } from "./logger.js";
 import { StateStore } from "./state/store.js";
+import { createGitHubClient } from "./github/client.js";
+import { createTelegramSender } from "./telegram/sender.js";
+import { runMonitoringCycle } from "./monitor/cycle.js";
+import { startScheduler } from "./scheduler.js";
 
 const log = createLogger("main");
 
@@ -11,12 +15,23 @@ async function main(): Promise<void> {
   await store.load();
 
   const state = store.getState();
-  log.info(
-    { repoCount: Object.keys(state.repos).length, version: state.meta.version },
-    "GitScope initialized successfully"
-  );
+  const repoCount = Object.keys(state.repos).length;
 
-  // Phase 2 will add: GitHub client init, Telegram bot init, scheduler start
+  const github = createGitHubClient(config.GITHUB_TOKEN);
+  const telegram = createTelegramSender(config.TELEGRAM_BOT_TOKEN, config.TELEGRAM_CHAT_ID);
+  const cycle = () => runMonitoringCycle(github, telegram, store, config.MONITOR_KEYWORDS);
+
+  startScheduler(config.MONITOR_CRON, cycle);
+
+  log.info(
+    {
+      repoCount,
+      version: state.meta.version,
+      cronExpression: config.MONITOR_CRON,
+      keywords: config.MONITOR_KEYWORDS.length,
+    },
+    "GitScope monitoring started",
+  );
 }
 
 main().catch((err) => {
