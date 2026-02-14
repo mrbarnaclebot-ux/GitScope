@@ -13,7 +13,7 @@ GitScope delivers a Telegram bot that monitors the OpenClaw/Claude Code ecosyste
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Infrastructure Foundation** - Reliable project skeleton with state persistence, config validation, and structured logging
-- [ ] **Phase 2: Monitoring & Alerting** - GitHub search, star velocity detection, and formatted Telegram alerts
+- [x] **Phase 2: Monitoring & Alerting** - GitHub search, star velocity detection, and formatted Telegram alerts
 - [ ] **Phase 3: Notification Reliability & Deployment** - Deduplication, batching, retry logic, and Render deployment
 
 ## Phase Details
@@ -47,9 +47,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md -- GitHub integration layer (throttling plugin, config extension, state schema, client, search)
-- [ ] 02-02-PLAN.md -- Business logic and Telegram layer (velocity, classifier, formatter, sender)
-- [ ] 02-03-PLAN.md -- Cycle orchestration, scheduler, and entry point wiring
+- [x] 02-01-PLAN.md -- GitHub integration layer (throttling plugin, config extension, state schema, client, search)
+- [x] 02-02-PLAN.md -- Business logic and Telegram layer (velocity, classifier, formatter, sender)
+- [x] 02-03-PLAN.md -- Cycle orchestration, scheduler, and entry point wiring
 
 ### Phase 3: Notification Reliability & Deployment
 **Goal**: Alerts are deduplicated, batched when busy, retried on failure, and the bot runs reliably on Render as an always-on background worker
@@ -74,5 +74,5 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Infrastructure Foundation | 2/2 | ✓ Complete | 2026-02-13 |
-| 2. Monitoring & Alerting | 0/3 | Planned | - |
+| 2. Monitoring & Alerting | 3/3 | ✓ Complete | 2026-02-14 |
 | 3. Notification Reliability & Deployment | 0/TBD | Not started | - |

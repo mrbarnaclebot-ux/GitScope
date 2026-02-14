@@ -9,16 +9,16 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Monitoring
 
-- [ ] **MON-01**: Bot searches GitHub for repositories matching configurable keywords (openclaw, claude-code, clawdbot, moltbot, clawhub, openclaw skills) in name, description, topics, and README
-- [ ] **MON-02**: Bot detects star velocity — repos <30 days old gaining >=5 stars/day, older repos gaining >=10 stars/day
-- [ ] **MON-03**: Bot discovers new repos appearing for the first time with >=20 stars
-- [ ] **MON-04**: Bot classifies alerts by severity tier (notable / hot / viral) based on velocity magnitude
-- [ ] **MON-05**: Bot runs monitoring cycle every 30 minutes via node-cron with overlap protection
-- [ ] **MON-06**: Bot tracks search and REST API rate limits as separate counters, respects Retry-After headers
+- [x] **MON-01**: Bot searches GitHub for repositories matching configurable keywords (openclaw, claude-code, clawdbot, moltbot, clawhub, openclaw skills) in name, description, topics, and README
+- [x] **MON-02**: Bot detects star velocity — repos <30 days old gaining >=5 stars/day, older repos gaining >=10 stars/day
+- [x] **MON-03**: Bot discovers new repos appearing for the first time with >=20 stars
+- [x] **MON-04**: Bot classifies alerts by severity tier (notable / hot / viral) based on velocity magnitude
+- [x] **MON-05**: Bot runs monitoring cycle every 30 minutes via node-cron with overlap protection
+- [x] **MON-06**: Bot tracks search and REST API rate limits as separate counters, respects Retry-After headers
 
 ### Notifications
 
-- [ ] **NOTF-01**: Bot sends formatted Telegram alerts with HTML parse mode — repo name (linked), star count, velocity delta, description, language, age
+- [x] **NOTF-01**: Bot sends formatted Telegram alerts with HTML parse mode — repo name (linked), star count, velocity delta, description, language, age
 - [ ] **NOTF-02**: Bot deduplicates notifications — same repo not re-alerted within cooldown period (configurable, default 7 days)
 - [ ] **NOTF-03**: Deduplication state persists across restarts (written to disk after successful delivery)
 - [ ] **NOTF-04**: Bot batches alerts when >5 repos trend simultaneously into a single digest message
@@ -73,13 +73,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MON-01 | Phase 2 | Pending |
-| MON-02 | Phase 2 | Pending |
-| MON-03 | Phase 2 | Pending |
-| MON-04 | Phase 2 | Pending |
-| MON-05 | Phase 2 | Pending |
-| MON-06 | Phase 2 | Pending |
-| NOTF-01 | Phase 2 | Pending |
+| MON-01 | Phase 2 | ✓ Done |
+| MON-02 | Phase 2 | ✓ Done |
+| MON-03 | Phase 2 | ✓ Done |
+| MON-04 | Phase 2 | ✓ Done |
+| MON-05 | Phase 2 | ✓ Done |
+| MON-06 | Phase 2 | ✓ Done |
+| NOTF-01 | Phase 2 | ✓ Done |
 | NOTF-02 | Phase 3 | Pending |
 | NOTF-03 | Phase 3 | Pending |
 | NOTF-04 | Phase 3 | Pending |
@@ -100,4 +100,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-13*
-*Last updated: 2026-02-13 after Phase 1 completion*
+*Last updated: 2026-02-14 after Phase 2 completion*
