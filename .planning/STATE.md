@@ -19,9 +19,9 @@ Progress: [█████████░] 89%
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: 2min
-- Total execution time: 0.20 hours
+- Total execution time: 0.23 hours
 
 **By Phase:**
 
@@ -33,9 +33,10 @@ Progress: [█████████░] 89%
 | 02 | P02 | 2min | 2 | 4 |
 | 02 | P03 | 2min | 2 | 3 |
 | 03 | P01 | 1min | 2 | 3 |
+| 03 | P02 | 2min | 2 | 3 |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 2min, 2min, 2min, 1min
+- Last 5 plans: 2min, 2min, 2min, 1min, 2min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -61,6 +62,10 @@ Recent decisions affecting current work:
 - [Phase 02]: Snapshot pruning to 48 entries prevents unbounded state growth while retaining 24h of history
 - [Phase 03]: autoRetry plugin with 3 retries and 60s max delay for transport errors
 - [Phase 03]: stripHtml as unexported module-level helper for fallback formatting
+- [Phase 03]: Sparkles emoji for "new" tier in digest, reuse TIER_EMOJI for severity tiers
+- [Phase 03]: Max 20 digest entries to stay under Telegram 4096-char limit
+- [Phase 03]: Graceful shutdown placed after store.load() but before startScheduler()
+- [Phase 03]: Render starter plan as cheapest always-on worker tier
 
 ### Pending Todos
 
@@ -73,5 +78,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 03-01-PLAN.md (notification resilience)
+Stopped at: Completed 03-02-PLAN.md (digest formatter, graceful shutdown, render deploy)
 Resume file: None
