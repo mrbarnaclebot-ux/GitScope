@@ -74,3 +74,40 @@ export function formatNewRepoAlert(
 
   return lines.join("\n");
 }
+
+export interface DigestEntry {
+  owner: string;
+  name: string;
+  stars: number;
+  starsPerDay: number;
+  tier: SeverityTier | "new";
+}
+
+const MAX_DIGEST_ENTRIES = 20;
+
+export function formatDigest(entries: DigestEntry[]): string {
+  const header = `<b>Trending Digest</b> -- ${entries.length} repos trending`;
+  const lines: string[] = [header, ""];
+
+  const visible = entries.slice(0, MAX_DIGEST_ENTRIES);
+
+  for (const entry of visible) {
+    const safeOwner = escapeHtml(entry.owner);
+    const safeName = escapeHtml(entry.name);
+    const url = `https://github.com/${entry.owner}/${entry.name}`;
+    const link = `<a href="${url}">${safeOwner}/${safeName}</a>`;
+
+    if (entry.tier === "new") {
+      lines.push(`\u2728 ${link} -- ${entry.stars} stars [NEW]`);
+    } else {
+      const emoji = TIER_EMOJI[entry.tier];
+      lines.push(`${emoji} ${link} -- ${entry.stars} stars (+${entry.starsPerDay}/day)`);
+    }
+  }
+
+  if (entries.length > MAX_DIGEST_ENTRIES) {
+    lines.push(`\n...and ${entries.length - MAX_DIGEST_ENTRIES} more`);
+  }
+
+  return lines.join("\n");
+}
