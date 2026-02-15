@@ -135,7 +135,7 @@ export async function runMonitoringCycle(
           forks: repo.forks,
         });
 
-        // Prune snapshots to last 48 entries (24 hours at 30-min intervals)
+        // Prune snapshots to last 48 entries (48 hours at 1-hour intervals)
         if (s.repos[key].snapshots.length > 48) {
           s.repos[key].snapshots = s.repos[key].snapshots.slice(-48);
         }
