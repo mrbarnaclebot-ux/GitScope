@@ -41,6 +41,8 @@ export function createTelegramSender(
     start() {
       bot.start({
         onStart: () => log.info("Telegram bot listening for commands"),
+      }).catch((err) => {
+        log.error({ err }, "Telegram bot failed to start — check TELEGRAM_BOT_TOKEN");
       });
     },
     async send(message: string): Promise<boolean> {
