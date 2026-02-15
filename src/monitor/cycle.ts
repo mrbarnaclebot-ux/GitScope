@@ -1,6 +1,6 @@
 import { searchRepos, type SearchResult } from "../github/search.js";
 import { calculateVelocity } from "./velocity.js";
-import { classifySeverity, shouldAlertNewRepo } from "./classifier.js";
+import { classifySeverity, shouldAlertNewRepo, THRESHOLD_CONFIG } from "./classifier.js";
 import { formatAlert, formatNewRepoAlert } from "../telegram/formatter.js";
 import type { TelegramSender } from "../telegram/sender.js";
 import { StateStore } from "../state/store.js";
@@ -59,8 +59,10 @@ export async function runMonitoringCycle(
         lastSnapshot,
       );
 
-      // Check cooldown before alerting
-      if (isWithinCooldown(store.getState(), key, cooldownDays)) {
+      // Skip repos above max stars -- focus on early trenders
+      if (repo.stars > THRESHOLD_CONFIG.maxStars) {
+        log.debug({ repo: key, stars: repo.stars }, "Repo exceeds max stars, skipping alert");
+      } else if (isWithinCooldown(store.getState(), key, cooldownDays)) {
         log.debug({ repo: key }, "Repo within cooldown, skipping alert");
       } else if (velocity.isNew && shouldAlertNewRepo(repo.stars)) {
         // New repo alert

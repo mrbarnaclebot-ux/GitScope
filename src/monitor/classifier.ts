@@ -5,6 +5,7 @@ export interface ThresholdConfig {
   youngRepoMinVelocity: number;
   oldRepoMinVelocity: number;
   newRepoMinStars: number;
+  maxStars: number;
   hotMultiplier: number;
   viralMultiplier: number;
 }
@@ -14,6 +15,7 @@ export const THRESHOLD_CONFIG: ThresholdConfig = {
   youngRepoMinVelocity: 8,
   oldRepoMinVelocity: 15,
   newRepoMinStars: 50,
+  maxStars: 800,
   hotMultiplier: 3,
   viralMultiplier: 10,
 };
