@@ -1,12 +1,7 @@
 import { searchRepos, type SearchResult } from "../github/search.js";
 import { calculateVelocity } from "./velocity.js";
 import { classifySeverity, shouldAlertNewRepo } from "./classifier.js";
-import {
-  formatAlert,
-  formatNewRepoAlert,
-  formatDigest,
-  type DigestEntry,
-} from "../telegram/formatter.js";
+import { formatAlert, formatNewRepoAlert } from "../telegram/formatter.js";
 import type { TelegramSender } from "../telegram/sender.js";
 import { StateStore } from "../state/store.js";
 import type { GitHubClient } from "../github/client.js";
@@ -30,7 +25,6 @@ function isWithinCooldown(
 interface PendingAlert {
   repoKey: string;
   message: string;
-  digestEntry: DigestEntry;
 }
 
 export async function runMonitoringCycle(
@@ -39,7 +33,6 @@ export async function runMonitoringCycle(
   store: StateStore,
   keywords: string[],
   cooldownDays: number,
-  batchThreshold: number,
 ): Promise<void> {
   let results: SearchResult[];
 
@@ -79,14 +72,7 @@ export async function runMonitoringCycle(
           language: repo.language,
           repoAgeDays: velocity.repoAgeDays,
         });
-        const digestEntry: DigestEntry = {
-          owner: repo.owner,
-          name: repo.name,
-          stars: repo.stars,
-          starsPerDay: 0,
-          tier: "new" as const,
-        };
-        pendingAlerts.push({ repoKey: key, message, digestEntry });
+        pendingAlerts.push({ repoKey: key, message });
       } else if (!velocity.isNew) {
         const tier = classifySeverity(
           velocity.starsPerDay,
@@ -104,14 +90,7 @@ export async function runMonitoringCycle(
             repoAgeDays: velocity.repoAgeDays,
             tier,
           });
-          const digestEntry: DigestEntry = {
-            owner: repo.owner,
-            name: repo.name,
-            stars: repo.stars,
-            starsPerDay: velocity.starsPerDay,
-            tier,
-          };
-          pendingAlerts.push({ repoKey: key, message, digestEntry });
+          pendingAlerts.push({ repoKey: key, message });
         }
       }
 
@@ -142,11 +121,11 @@ export async function runMonitoringCycle(
       });
     }
 
-    // Send alerts using batch-or-individual strategy
-    if (pendingAlerts.length > batchThreshold) {
-      // Digest mode: single message
-      const digest = formatDigest(pendingAlerts.map((a) => a.digestEntry));
-      const sent = await telegram.send(digest);
+    // Send all alerts as a single combined message
+    if (pendingAlerts.length > 0) {
+      const combined = pendingAlerts.map((a) => a.message).join("\n\n---\n\n");
+      const header = `<b>GitScope Report</b> -- ${pendingAlerts.length} repo${pendingAlerts.length === 1 ? "" : "s"}\n\n`;
+      const sent = await telegram.send(header + combined);
       if (sent) {
         for (const alert of pendingAlerts) {
           store.updateState((s) => {
@@ -156,21 +135,7 @@ export async function runMonitoringCycle(
           });
         }
         alertCount = pendingAlerts.length;
-        log.info({ alertCount }, "Digest alert sent");
-      }
-    } else {
-      // Individual mode: one message per repo
-      for (const alert of pendingAlerts) {
-        const sent = await telegram.send(alert.message);
-        if (sent) {
-          alertCount++;
-          store.updateState((s) => {
-            s.notifications[alert.repoKey] = {
-              lastAlertAt: new Date().toISOString(),
-            };
-          });
-          log.info({ repo: alert.repoKey }, "Individual alert sent");
-        }
+        log.info({ alertCount }, "Combined alert sent");
       }
     }
 

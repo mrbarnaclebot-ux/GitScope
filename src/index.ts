@@ -39,7 +39,7 @@ async function main(): Promise<void> {
   const telegram = createTelegramSender(config.TELEGRAM_BOT_TOKEN, config.TELEGRAM_CHAT_ID);
   const cycle = () => runMonitoringCycle(
     github, telegram, store, config.MONITOR_KEYWORDS,
-    config.COOLDOWN_DAYS, config.BATCH_THRESHOLD,
+    config.COOLDOWN_DAYS,
   );
 
   telegram.start();

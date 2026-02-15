@@ -24,11 +24,6 @@ const envSchema = z.object({
     .default("7")
     .transform((s) => parseInt(s, 10))
     .pipe(z.number().min(1).max(90)),
-  BATCH_THRESHOLD: z
-    .string()
-    .default("3")
-    .transform((s) => parseInt(s, 10))
-    .pipe(z.number().min(1).max(100)),
 });
 
 export type Config = z.infer<typeof envSchema>;
