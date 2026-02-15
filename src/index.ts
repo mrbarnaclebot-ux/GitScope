@@ -42,6 +42,7 @@ async function main(): Promise<void> {
     config.COOLDOWN_DAYS, config.BATCH_THRESHOLD,
   );
 
+  telegram.start();
   startScheduler(config.MONITOR_CRON, cycle);
 
   log.info(

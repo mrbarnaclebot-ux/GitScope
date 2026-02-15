@@ -6,6 +6,7 @@ const log = createLogger("telegram");
 
 export interface TelegramSender {
   send(message: string): Promise<boolean>;
+  start(): void;
 }
 
 function stripHtml(html: string): string {
@@ -30,7 +31,18 @@ export function createTelegramSender(
     }),
   );
 
+  bot.command("chatid", async (ctx) => {
+    await ctx.reply(`Chat ID: <code>${ctx.chat.id}</code>`, {
+      parse_mode: "HTML",
+    });
+  });
+
   return {
+    start() {
+      bot.start({
+        onStart: () => log.info("Telegram bot listening for commands"),
+      });
+    },
     async send(message: string): Promise<boolean> {
       try {
         await bot.api.sendMessage(chatId, message, { parse_mode: "HTML" });
