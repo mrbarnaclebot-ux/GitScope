@@ -10,6 +10,9 @@ import { createLogger } from "../logger.js";
 
 const log = createLogger("monitor:cycle");
 
+const OPENCLAW_PATTERN = /openclaw/i;
+const MAX_REPO_AGE_DAYS = 7;
+
 function isWithinCooldown(
   state: AppState,
   repoKey: string,
@@ -20,6 +23,78 @@ function isWithinCooldown(
   const lastAlert = new Date(record.lastAlertAt);
   const cooldownMs = cooldownDays * 24 * 60 * 60 * 1000;
   return Date.now() - lastAlert.getTime() < cooldownMs;
+}
+
+function repoFieldsMentionOpenClaw(repo: SearchResult): boolean {
+  const candidates = [
+    repo.name,
+    repo.fullName,
+    repo.description ?? "",
+    ...repo.topics,
+  ];
+
+  return candidates.some((value) => OPENCLAW_PATTERN.test(value));
+}
+
+async function readmeMentionsOpenClaw(
+  github: GitHubClient,
+  repo: SearchResult,
+): Promise<boolean> {
+  try {
+    const { data } = await github.rest.repos.getReadme({
+      owner: repo.owner,
+      repo: repo.name,
+    });
+
+    const content = (data as { content?: string }).content;
+    if (!content) {
+      return false;
+    }
+
+    const encoding = (data as { encoding?: BufferEncoding }).encoding ?? "base64";
+    const decoded = Buffer.from(content, encoding).toString("utf-8");
+    return OPENCLAW_PATTERN.test(decoded);
+  } catch (err) {
+    log.debug(
+      { repo: `${repo.owner}/${repo.name}`, err },
+      "Unable to fetch README for OpenClaw check",
+    );
+    return false;
+  }
+}
+
+async function repoMentionsOpenClaw(
+  github: GitHubClient,
+  repo: SearchResult,
+): Promise<boolean> {
+  if (repoFieldsMentionOpenClaw(repo)) {
+    return true;
+  }
+
+  return readmeMentionsOpenClaw(github, repo);
+}
+
+async function ownerHasXAccount(
+  github: GitHubClient,
+  owner: string,
+  cache: Map<string, boolean>,
+): Promise<boolean> {
+  const cached = cache.get(owner);
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  try {
+    const { data } = await github.rest.users.getByUsername({ username: owner });
+    const twitterUsername = data.twitter_username?.trim();
+    const hasXAccount = Boolean(twitterUsername);
+    cache.set(owner, hasXAccount);
+    return hasXAccount;
+  } catch (err) {
+    log.debug({ owner, err }, "Unable to fetch owner profile for X account check");
+    cache.set(owner, false);
+    return false;
+  }
 }
 
 interface PendingAlert {
@@ -46,6 +121,7 @@ export async function runMonitoringCycle(
 
   let alertCount = 0;
   const pendingAlerts: PendingAlert[] = [];
+  const xAccountCache = new Map<string, boolean>();
 
   try {
     for (const repo of results) {
@@ -58,6 +134,29 @@ export async function runMonitoringCycle(
         repo.createdAt,
         lastSnapshot,
       );
+
+      if (velocity.repoAgeDays > MAX_REPO_AGE_DAYS) {
+        log.debug(
+          { repo: key, repoAgeDays: velocity.repoAgeDays },
+          "Repo exceeds max age window, skipping",
+        );
+        continue;
+      }
+
+      const mentionsOpenClaw = await repoMentionsOpenClaw(github, repo);
+      if (!mentionsOpenClaw) {
+        log.debug({ repo: key }, "Repo does not mention OpenClaw, skipping");
+        continue;
+      }
+
+      const hasXAccount = await ownerHasXAccount(github, repo.owner, xAccountCache);
+      if (!hasXAccount) {
+        log.debug(
+          { repo: key, owner: repo.owner },
+          "Owner missing X account, skipping",
+        );
+        continue;
+      }
 
       // Skip repos above max stars -- focus on early trenders
       if (repo.stars > THRESHOLD_CONFIG.maxStars) {
