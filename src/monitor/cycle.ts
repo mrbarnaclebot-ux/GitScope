@@ -11,6 +11,7 @@ import { createLogger } from "../logger.js";
 const log = createLogger("monitor:cycle");
 
 const OPENCLAW_PATTERN = /openclaw/i;
+const AI_AGENTS_PATTERN = /\bai[- ]?agents?\b|\bagentic\b|\bagent\s+framework/i;
 const MAX_REPO_AGE_DAYS = 7;
 
 function isWithinCooldown(
@@ -25,7 +26,7 @@ function isWithinCooldown(
   return Date.now() - lastAlert.getTime() < cooldownMs;
 }
 
-function repoFieldsMentionOpenClaw(repo: SearchResult): boolean {
+function repoFieldsMatchCriteria(repo: SearchResult): boolean {
   const candidates = [
     repo.name,
     repo.fullName,
@@ -33,10 +34,12 @@ function repoFieldsMentionOpenClaw(repo: SearchResult): boolean {
     ...repo.topics,
   ];
 
-  return candidates.some((value) => OPENCLAW_PATTERN.test(value));
+  return candidates.some(
+    (value) => OPENCLAW_PATTERN.test(value) || AI_AGENTS_PATTERN.test(value),
+  );
 }
 
-async function readmeMentionsOpenClaw(
+async function readmeMatchesCriteria(
   github: GitHubClient,
   repo: SearchResult,
 ): Promise<boolean> {
@@ -53,48 +56,25 @@ async function readmeMentionsOpenClaw(
 
     const encoding = (data as { encoding?: BufferEncoding }).encoding ?? "base64";
     const decoded = Buffer.from(content, encoding).toString("utf-8");
-    return OPENCLAW_PATTERN.test(decoded);
+    return OPENCLAW_PATTERN.test(decoded) || AI_AGENTS_PATTERN.test(decoded);
   } catch (err) {
     log.debug(
       { repo: `${repo.owner}/${repo.name}`, err },
-      "Unable to fetch README for OpenClaw check",
+      "Unable to fetch README for criteria check",
     );
     return false;
   }
 }
 
-async function repoMentionsOpenClaw(
+async function repoMatchesCriteria(
   github: GitHubClient,
   repo: SearchResult,
 ): Promise<boolean> {
-  if (repoFieldsMentionOpenClaw(repo)) {
+  if (repoFieldsMatchCriteria(repo)) {
     return true;
   }
 
-  return readmeMentionsOpenClaw(github, repo);
-}
-
-async function ownerHasXAccount(
-  github: GitHubClient,
-  owner: string,
-  cache: Map<string, boolean>,
-): Promise<boolean> {
-  const cached = cache.get(owner);
-  if (cached !== undefined) {
-    return cached;
-  }
-
-  try {
-    const { data } = await github.rest.users.getByUsername({ username: owner });
-    const twitterUsername = data.twitter_username?.trim();
-    const hasXAccount = Boolean(twitterUsername);
-    cache.set(owner, hasXAccount);
-    return hasXAccount;
-  } catch (err) {
-    log.debug({ owner, err }, "Unable to fetch owner profile for X account check");
-    cache.set(owner, false);
-    return false;
-  }
+  return readmeMatchesCriteria(github, repo);
 }
 
 interface PendingAlert {
@@ -121,7 +101,6 @@ export async function runMonitoringCycle(
 
   let alertCount = 0;
   const pendingAlerts: PendingAlert[] = [];
-  const xAccountCache = new Map<string, boolean>();
 
   try {
     for (const repo of results) {
@@ -154,18 +133,9 @@ export async function runMonitoringCycle(
         continue;
       }
 
-      const mentionsOpenClaw = await repoMentionsOpenClaw(github, repo);
-      if (!mentionsOpenClaw) {
-        log.debug({ repo: key }, "Repo does not mention OpenClaw, skipping");
-        continue;
-      }
-
-      const hasXAccount = await ownerHasXAccount(github, repo.owner, xAccountCache);
-      if (!hasXAccount) {
-        log.debug(
-          { repo: key, owner: repo.owner },
-          "Owner missing X account, skipping",
-        );
+      const matchesCriteria = await repoMatchesCriteria(github, repo);
+      if (!matchesCriteria) {
+        log.debug({ repo: key }, "Repo does not mention OpenClaw or AI agents, skipping");
         continue;
       }
 
