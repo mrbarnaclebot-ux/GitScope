@@ -143,6 +143,17 @@ export async function runMonitoringCycle(
         continue;
       }
 
+      // Skip repos above max stars before expensive API calls -- focus on early trenders
+      if (repo.stars > THRESHOLD_CONFIG.maxStars) {
+        log.debug({ repo: key, stars: repo.stars }, "Repo exceeds max stars, skipping");
+        continue;
+      }
+
+      if (!repo.owner) {
+        log.debug({ repo: key }, "Repo has no owner, skipping");
+        continue;
+      }
+
       const mentionsOpenClaw = await repoMentionsOpenClaw(github, repo);
       if (!mentionsOpenClaw) {
         log.debug({ repo: key }, "Repo does not mention OpenClaw, skipping");
@@ -158,10 +169,7 @@ export async function runMonitoringCycle(
         continue;
       }
 
-      // Skip repos above max stars -- focus on early trenders
-      if (repo.stars > THRESHOLD_CONFIG.maxStars) {
-        log.debug({ repo: key, stars: repo.stars }, "Repo exceeds max stars, skipping alert");
-      } else if (isWithinCooldown(store.getState(), key, cooldownDays)) {
+      if (isWithinCooldown(store.getState(), key, cooldownDays)) {
         log.debug({ repo: key }, "Repo within cooldown, skipping alert");
       } else if (velocity.isNew && shouldAlertNewRepo(repo.stars)) {
         // New repo alert
