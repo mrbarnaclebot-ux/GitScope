@@ -54,6 +54,12 @@ async function main(): Promise<void> {
     },
     "GitScope monitoring started",
   );
+
+  // Run first cycle immediately so we don't wait for the first cron tick
+  log.info("Running initial monitoring cycle");
+  cycle().catch((err) => {
+    log.error({ err }, "Initial monitoring cycle failed");
+  });
 }
 
 main().catch((err) => {

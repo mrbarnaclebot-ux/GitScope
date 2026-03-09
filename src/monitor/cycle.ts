@@ -10,9 +10,13 @@ import { createLogger } from "../logger.js";
 
 const log = createLogger("monitor:cycle");
 
-const OPENCLAW_PATTERN = /openclaw/i;
-const AI_AGENTS_PATTERN = /\bai[- ]?agents?\b|\bagentic\b|\bagent\s+framework/i;
-const MAX_REPO_AGE_DAYS = 7;
+function buildKeywordPatterns(keywords: string[]): RegExp[] {
+  return keywords.map((kw) => {
+    const escaped = kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const flexible = escaped.replace(/[\s-]+/g, "[\\s\\-]?");
+    return new RegExp(flexible, "i");
+  });
+}
 
 function isWithinCooldown(
   state: AppState,
@@ -26,7 +30,7 @@ function isWithinCooldown(
   return Date.now() - lastAlert.getTime() < cooldownMs;
 }
 
-function repoFieldsMatchCriteria(repo: SearchResult): boolean {
+function repoFieldsMatchCriteria(repo: SearchResult, patterns: RegExp[]): boolean {
   const candidates = [
     repo.name,
     repo.fullName,
@@ -35,13 +39,14 @@ function repoFieldsMatchCriteria(repo: SearchResult): boolean {
   ];
 
   return candidates.some(
-    (value) => OPENCLAW_PATTERN.test(value) || AI_AGENTS_PATTERN.test(value),
+    (value) => patterns.some((p) => p.test(value)),
   );
 }
 
 async function readmeMatchesCriteria(
   github: GitHubClient,
   repo: SearchResult,
+  patterns: RegExp[],
 ): Promise<boolean> {
   try {
     const { data } = await github.rest.repos.getReadme({
@@ -56,7 +61,7 @@ async function readmeMatchesCriteria(
 
     const encoding = (data as { encoding?: BufferEncoding }).encoding ?? "base64";
     const decoded = Buffer.from(content, encoding).toString("utf-8");
-    return OPENCLAW_PATTERN.test(decoded) || AI_AGENTS_PATTERN.test(decoded);
+    return patterns.some((p) => p.test(decoded));
   } catch (err) {
     log.debug(
       { repo: `${repo.owner}/${repo.name}`, err },
@@ -69,12 +74,13 @@ async function readmeMatchesCriteria(
 async function repoMatchesCriteria(
   github: GitHubClient,
   repo: SearchResult,
+  patterns: RegExp[],
 ): Promise<boolean> {
-  if (repoFieldsMatchCriteria(repo)) {
+  if (repoFieldsMatchCriteria(repo, patterns)) {
     return true;
   }
 
-  return readmeMatchesCriteria(github, repo);
+  return readmeMatchesCriteria(github, repo, patterns);
 }
 
 interface PendingAlert {
@@ -101,6 +107,7 @@ export async function runMonitoringCycle(
 
   let alertCount = 0;
   const pendingAlerts: PendingAlert[] = [];
+  const patterns = buildKeywordPatterns(keywords);
 
   try {
     for (const repo of results) {
@@ -114,15 +121,7 @@ export async function runMonitoringCycle(
         lastSnapshot,
       );
 
-      if (velocity.repoAgeDays > MAX_REPO_AGE_DAYS) {
-        log.debug(
-          { repo: key, repoAgeDays: velocity.repoAgeDays },
-          "Repo exceeds max age window, skipping",
-        );
-        continue;
-      }
-
-      // Skip repos above max stars before expensive API calls -- focus on early trenders
+      // Skip repos above max stars -- focus on rising repos, not mega-projects
       if (repo.stars > THRESHOLD_CONFIG.maxStars) {
         log.debug({ repo: key, stars: repo.stars }, "Repo exceeds max stars, skipping");
         continue;
@@ -133,9 +132,9 @@ export async function runMonitoringCycle(
         continue;
       }
 
-      const matchesCriteria = await repoMatchesCriteria(github, repo);
+      const matchesCriteria = await repoMatchesCriteria(github, repo, patterns);
       if (!matchesCriteria) {
-        log.debug({ repo: key }, "Repo does not mention OpenClaw or AI agents, skipping");
+        log.debug({ repo: key }, "Repo does not match configured keywords, skipping");
         continue;
       }
 

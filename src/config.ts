@@ -18,7 +18,7 @@ const envSchema = z.object({
     .string()
     .default("openclaw,claude-code,clawdbot,moltbot,clawhub,openclaw skills,ai agent,ai agents")
     .transform((s) => s.split(",").map((k) => k.trim())),
-  MONITOR_CRON: z.string().default("0 * * * *"),
+  MONITOR_CRON: z.string().default("*/30 * * * *"),
   COOLDOWN_DAYS: z
     .string()
     .default("7")
